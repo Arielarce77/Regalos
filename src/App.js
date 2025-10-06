@@ -125,6 +125,8 @@ const App = () => {
                 gifts={giftsData}
                 resetGiftToZero={(id) => setGiftsData(prev => prev.map(g => g.id === id ? { ...g, currentStock: 0 } : g))}
                 resetAllToZero={() => setGiftsData(prev => prev.map(g => ({ ...g, currentStock: 0 })))}
+                resetGiftToMax={(id) => setGiftsData(prev => prev.map(g => g.id === id ? { ...g, currentStock: g.maxStock >= 999 ? g.maxStock : g.maxStock } : g))}
+                resetAllToMax={() => setGiftsData(prev => prev.map(g => ({ ...g, currentStock: g.maxStock >= 999 ? g.maxStock : g.maxStock })))}
                 resetGiftsToDefaults={() => {
                   try { localStorage.removeItem('giftsData'); } catch (err) {}
                   setGiftsData(initialGifts.map(g => ({ ...g })));

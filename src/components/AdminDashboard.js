@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Calendar, DollarSign, Gift, LogOut, MessageCircle, Users } from 'lucide-react';
 
-const AdminDashboard = ({ contributions, onLogout, gifts = [], resetGiftToZero, resetAllToZero }) => {
+const AdminDashboard = ({ contributions, onLogout, gifts = [], resetGiftToZero, resetAllToZero, resetGiftToMax, resetAllToMax, resetGiftsToDefaults }) => {
   const totalAmount = contributions.reduce((sum, contribution) => sum + contribution.amount, 0);
   const totalContributions = contributions.length;
   const contributionsWithMessages = contributions.filter(c => c.message).length;
@@ -166,18 +166,28 @@ const AdminDashboard = ({ contributions, onLogout, gifts = [], resetGiftToZero, 
         <div className="mt-8 bg-white rounded-2xl p-6 shadow-lg border border-rose-200">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold text-gray-800">Gestión de Stock</h2>
-            <button
-              onClick={() => { if (confirm('¿Poner todos los contadores a cero?')) resetAllToZero && resetAllToZero(); }}
-              className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
-            >
-              Poner todo a 0
-            </button>
-            <button
-              onClick={() => { if (confirm('¿Restaurar valores por defecto (se eliminará el estado guardado)?')) resetGiftsToDefaults && resetGiftsToDefaults(); }}
-              className="ml-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
-            >
-              Restaurar valores por defecto
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => { if (confirm('¿Poner todos los contadores a cero?')) resetAllToZero && resetAllToZero(); }}
+                className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
+              >
+                Poner todo a 0
+              </button>
+
+              <button
+                onClick={() => { if (confirm('¿Poner todos los contadores a su máximo?')) resetAllToMax && resetAllToMax(); }}
+                className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors"
+              >
+                Restaurar todo al máximo
+              </button>
+
+              <button
+                onClick={() => { if (confirm('¿Restaurar valores por defecto (se eliminará el estado guardado)?')) resetGiftsToDefaults && resetGiftsToDefaults(); }}
+                className="ml-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+              >
+                Restaurar valores por defecto
+              </button>
+            </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-4">
@@ -193,6 +203,13 @@ const AdminDashboard = ({ contributions, onLogout, gifts = [], resetGiftToZero, 
                     className="bg-yellow-500 text-white px-3 py-1 rounded-md hover:bg-yellow-600 transition-colors"
                   >
                     Poner a 0
+                  </button>
+
+                  <button
+                    onClick={() => { if (confirm(`¿Restaurar al máximo el stock de "${gift.title}"?`)) resetGiftToMax && resetGiftToMax(gift.id); }}
+                    className="bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600 transition-colors"
+                  >
+                    Restaurar al máximo
                   </button>
                 </div>
               </div>
