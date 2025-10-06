@@ -1,8 +1,7 @@
-import React from 'react';
 import { motion } from 'framer-motion';
-import { LogOut, Gift, Users, DollarSign, MessageCircle, Calendar } from 'lucide-react';
+import { Calendar, DollarSign, Gift, LogOut, MessageCircle, Users } from 'lucide-react';
 
-const AdminDashboard = ({ contributions, onLogout }) => {
+const AdminDashboard = ({ contributions, onLogout, gifts = [], resetGiftToZero, resetAllToZero }) => {
   const totalAmount = contributions.reduce((sum, contribution) => sum + contribution.amount, 0);
   const totalContributions = contributions.length;
   const contributionsWithMessages = contributions.filter(c => c.message).length;
@@ -162,6 +161,43 @@ const AdminDashboard = ({ contributions, onLogout }) => {
               ))}
             </div>
           </motion.div>
+        </div>
+        
+        <div className="mt-8 bg-white rounded-2xl p-6 shadow-lg border border-rose-200">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-bold text-gray-800">Gestión de Stock</h2>
+            <button
+              onClick={() => { if (confirm('¿Poner todos los contadores a cero?')) resetAllToZero && resetAllToZero(); }}
+              className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
+            >
+              Poner todo a 0
+            </button>
+            <button
+              onClick={() => { if (confirm('¿Restaurar valores por defecto (se eliminará el estado guardado)?')) resetGiftsToDefaults && resetGiftsToDefaults(); }}
+              className="ml-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+            >
+              Restaurar valores por defecto
+            </button>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            {gifts.map(gift => (
+              <div key={gift.id} className="p-4 border rounded-lg flex items-center justify-between">
+                <div>
+                  <div className="font-medium text-gray-800">{gift.title}</div>
+                  <div className="text-sm text-gray-500">Stock: {gift.currentStock} / {gift.maxStock >= 999 ? 'Ilimitado' : gift.maxStock}</div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => { if (confirm(`¿Poner a 0 el stock de "${gift.title}"?`)) resetGiftToZero && resetGiftToZero(gift.id); }}
+                    className="bg-yellow-500 text-white px-3 py-1 rounded-md hover:bg-yellow-600 transition-colors"
+                  >
+                    Poner a 0
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

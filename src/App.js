@@ -6,7 +6,7 @@ import ContributionForm from './components/ContributionForm';
 import GiftGrid from './components/GiftGrid';
 import ThankYouScreen from './components/ThankYouScreen';
 import WelcomeScreen from './components/WelcomeScreen';
-import { gifts } from './data/gifts';
+import { gifts as initialGifts } from './data/gifts';
 
 const App = () => {
   const [currentScreen, setCurrentScreen] = useState('welcome');
@@ -20,6 +20,20 @@ const App = () => {
     }
   });
   const [lastContribution, setLastContribution] = useState(null);
+  const [giftsData, setGiftsData] = useState(() => {
+    try {
+      const saved = localStorage.getItem('giftsData');
+      if (saved) return JSON.parse(saved);
+    } catch (err) {}
+    return initialGifts.map(g => ({ ...g }));
+  });
+
+  // persist giftsData to localStorage so stock changes survive reloads
+  useEffect(() => {
+    try {
+      localStorage.setItem('giftsData', JSON.stringify(giftsData));
+    } catch (err) {}
+  }, [giftsData]);
 
   const handleContinue = () => {
     setCurrentScreen('gifts');
@@ -38,6 +52,13 @@ const App = () => {
   const handleSubmitContribution = (contributionData) => {
     setContributions(prev => [...prev, contributionData]);
     setLastContribution(contributionData);
+    // decrement stock for the contributed gift (if not unlimited)
+    setGiftsData(prev => prev.map(g => {
+      if (g.title === contributionData.giftTitle && g.maxStock < 999) {
+        return { ...g, currentStock: Math.max(0, g.currentStock - 1) };
+      }
+      return g;
+    }));
     setCurrentScreen('thankyou');
   };
 
@@ -74,7 +95,7 @@ const App = () => {
             currentScreen === 'welcome' ? (
               <WelcomeScreen onContinue={handleContinue} />
             ) : currentScreen === 'gifts' ? (
-              <GiftGrid gifts={gifts} onSelectGift={handleSelectGift} />
+              <GiftGrid gifts={giftsData} onSelectGift={handleSelectGift} />
             ) : currentScreen === 'contribution' ? (
               <ContributionForm 
                 selectedGift={selectedGift}
@@ -101,6 +122,13 @@ const App = () => {
               <AdminDashboard 
                 contributions={contributions}
                 onLogout={handleAdminLogout}
+                gifts={giftsData}
+                resetGiftToZero={(id) => setGiftsData(prev => prev.map(g => g.id === id ? { ...g, currentStock: 0 } : g))}
+                resetAllToZero={() => setGiftsData(prev => prev.map(g => ({ ...g, currentStock: 0 })))}
+                resetGiftsToDefaults={() => {
+                  try { localStorage.removeItem('giftsData'); } catch (err) {}
+                  setGiftsData(initialGifts.map(g => ({ ...g })));
+                }}
               />
             )
           } 
