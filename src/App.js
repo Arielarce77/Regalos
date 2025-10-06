@@ -127,6 +127,9 @@ const App = () => {
                 resetAllToZero={() => setGiftsData(prev => prev.map(g => ({ ...g, currentStock: 0 })))}
                 resetGiftToMax={(id) => setGiftsData(prev => prev.map(g => g.id === id ? { ...g, currentStock: g.maxStock >= 999 ? g.maxStock : g.maxStock } : g))}
                 resetAllToMax={() => setGiftsData(prev => prev.map(g => ({ ...g, currentStock: g.maxStock >= 999 ? g.maxStock : g.maxStock })))}
+                // reactivate a gift (set available again) and edit gift properties
+                reactivateGift={(id) => setGiftsData(prev => prev.map(g => g.id === id ? { ...g, currentStock: g.maxStock >= 999 ? g.maxStock : Math.max(1, Math.min(g.maxStock, 1)) } : g))}
+                editGift={(id, updates) => setGiftsData(prev => prev.map(g => g.id === id ? { ...g, ...updates } : g))}
                 resetGiftsToDefaults={() => {
                   try { localStorage.removeItem('giftsData'); } catch (err) {}
                   setGiftsData(initialGifts.map(g => ({ ...g })));

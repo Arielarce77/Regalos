@@ -1,6 +1,5 @@
-import React from 'react';
 import { motion } from 'framer-motion';
-import { Gift, Users, Infinity } from 'lucide-react';
+import { Gift, Infinity, Users } from 'lucide-react';
 
 const GiftCard = ({ gift, onSelect, index }) => {
   const isOutOfStock = gift.currentStock === 0;
@@ -35,7 +34,7 @@ const GiftCard = ({ gift, onSelect, index }) => {
         {isOutOfStock && (
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
             <span className="bg-red-500 text-white px-4 py-2 rounded-full font-semibold">
-              ¡Agotado!
+              Completa
             </span>
           </div>
         )}
@@ -101,7 +100,7 @@ const GiftCard = ({ gift, onSelect, index }) => {
           whileTap={!isOutOfStock ? { scale: 0.98 } : {}}
         >
           <Gift className="w-5 h-5" />
-          {isOutOfStock ? 'No disponible' : 'Elegir este regalo'}
+          {isOutOfStock ? 'Completa' : 'Elegir este regalo'}
         </motion.button>
       </div>
     </motion.div>

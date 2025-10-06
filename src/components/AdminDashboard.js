@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Calendar, DollarSign, Gift, LogOut, MessageCircle, Users } from 'lucide-react';
 
-const AdminDashboard = ({ contributions, onLogout, gifts = [], resetGiftToZero, resetAllToZero, resetGiftToMax, resetAllToMax, resetGiftsToDefaults }) => {
+const AdminDashboard = ({ contributions, onLogout, gifts = [], resetGiftToZero, resetAllToZero, resetGiftToMax, resetAllToMax, reactivateGift, editGift, resetGiftsToDefaults }) => {
   const totalAmount = contributions.reduce((sum, contribution) => sum + contribution.amount, 0);
   const totalContributions = contributions.length;
   const contributionsWithMessages = contributions.filter(c => c.message).length;
@@ -210,6 +210,51 @@ const AdminDashboard = ({ contributions, onLogout, gifts = [], resetGiftToZero, 
                     className="bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600 transition-colors"
                   >
                     Restaurar al máximo
+                  </button>
+
+                  {/* Mostrar botón Reactivar si está completado */}
+                  {gift.currentStock === 0 && (
+                    <button
+                      onClick={() => { if (confirm(`¿Reactivar "${gift.title}" (establecer stock disponible)?`)) reactivateGift && reactivateGift(gift.id); }}
+                      className="bg-indigo-500 text-white px-3 py-1 rounded-md hover:bg-indigo-600 transition-colors"
+                    >
+                      Reactivar
+                    </button>
+                  )}
+
+                  {/* Botón para editar propiedades del regalo */}
+                  <button
+                    onClick={() => {
+                      try {
+                        const newTitle = prompt('Título', gift.title);
+                        if (newTitle === null) return;
+                        const newSuggested = prompt('Aporte sugerido (número)', String(gift.suggestedAmount ?? 0));
+                        if (newSuggested === null) return;
+                        const newMax = prompt('Stock máximo (usar 999 para ilimitado)', String(gift.maxStock ?? 0));
+                        if (newMax === null) return;
+                        const newDesc = prompt('Descripción', gift.description ?? '');
+                        if (newDesc === null) return;
+                        const newImage = prompt('URL imagen', gift.image ?? '');
+                        if (newImage === null) return;
+
+                        const updates = {
+                          title: newTitle,
+                          suggestedAmount: Number(newSuggested) || 0,
+                          maxStock: Number(newMax) || 0,
+                          description: newDesc,
+                          image: newImage,
+                        };
+
+                        if (confirm('¿Guardar los cambios en "' + gift.title + '"?')) {
+                          editGift && editGift(gift.id, updates);
+                        }
+                      } catch (err) {
+                        console.error('Edición cancelada o inválida', err);
+                      }
+                    }}
+                    className="bg-sky-500 text-white px-3 py-1 rounded-md hover:bg-sky-600 transition-colors"
+                  >
+                    Editar
                   </button>
                 </div>
               </div>
